@@ -79,6 +79,15 @@ export const defaultContent: SiteContent = {
     title: "Quem é Anderson Nascimento?",
     subtitle: "Especialista em Milhas e Emissões de Luxo",
     description: "Com mais de 10 anos de experiência no mercado de turismo e milhas aéreas, Anderson Nascimento já ajudou milhares de pessoas a realizarem o sonho de viajar em classe executiva e primeira classe pagando menos que uma passagem econômica. Sua missão é democratizar o acesso ao luxo através de estratégias inteligentes de acúmulo e emissão, revelando os segredos que as companhias aéreas tentam esconder.",
-    imageUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=800"
+    imageUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=800",
+    experienceBadge: {
+      value: "10+",
+      label: "ANOS DE EXP."
+    },
+    achievements: [
+      "Especialista em Emissões Internacionais",
+      "Mentor de Milhares de Alunos",
+      "Criador do Método Trajeto das Milhas"
+    ]
   }
 };

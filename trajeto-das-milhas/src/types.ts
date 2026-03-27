@@ -61,5 +61,10 @@ export interface SiteContent {
     subtitle: string;
     description: string;
     imageUrl: string;
+    experienceBadge: {
+      value: string;
+      label: string;
+    };
+    achievements: string[];
   };
 }

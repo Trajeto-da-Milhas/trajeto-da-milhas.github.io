@@ -6,6 +6,13 @@ const About: React.FC = () => {
   const { content } = useContent();
   const { about } = content;
 
+  // Cores para os círculos das conquistas
+  const achievementColors = [
+    { bg: 'bg-[#00D4FF]/10', dot: 'bg-[#00D4FF]' },
+    { bg: 'bg-[#9D00FF]/10', dot: 'bg-[#9D00FF]' },
+    { bg: 'bg-[#00FF94]/10', dot: 'bg-[#00FF94]' },
+  ];
+
   return (
     <section id="about" className="py-24 bg-[#0A1128] relative overflow-hidden">
       {/* Background Elements */}
@@ -33,10 +40,14 @@ const About: React.FC = () => {
                 referrerPolicy="no-referrer"
               />
               {/* Floating Badge */}
-              <div className="absolute -bottom-6 -right-6 bg-[#00D4FF] text-[#0A1128] font-bold p-6 rounded-xl shadow-xl">
-                <p className="text-3xl">10+</p>
-                <p className="text-sm uppercase tracking-wider">Anos de Exp.</p>
-              </div>
+              {about.experienceBadge && (
+                <div className="absolute -bottom-6 -right-6 bg-[#00D4FF] text-[#0A1128] font-bold p-6 rounded-xl shadow-xl min-w-[140px] text-center">
+                  <p className="text-3xl leading-none mb-1">{about.experienceBadge.value}</p>
+                  <p className="text-[10px] uppercase tracking-widest font-black whitespace-pre-line leading-tight">
+                    {about.experienceBadge.label}
+                  </p>
+                </div>
+              )}
             </div>
           </motion.div>
 
@@ -58,26 +69,22 @@ const About: React.FC = () => {
               <p className="text-xl text-[#8BA3C0] leading-relaxed">
                 {about.description}
               </p>
-              <div className="pt-8">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 rounded-full bg-[#00D4FF]/10 flex items-center justify-center">
-                    <div className="w-3 h-3 rounded-full bg-[#00D4FF]" />
-                  </div>
-                  <p className="text-white font-medium">Especialista em Emissões Internacionais</p>
+              
+              {about.achievements && about.achievements.length > 0 && (
+                <div className="pt-8 space-y-6">
+                  {about.achievements.map((achievement, index) => {
+                    const color = achievementColors[index % achievementColors.length];
+                    return (
+                      <div key={index} className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-full ${color.bg} flex items-center justify-center flex-shrink-0`}>
+                          <div className={`w-3 h-3 rounded-full ${color.dot}`} />
+                        </div>
+                        <p className="text-white font-medium">{achievement}</p>
+                      </div>
+                    );
+                  })}
                 </div>
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 rounded-full bg-[#9D00FF]/10 flex items-center justify-center">
-                    <div className="w-3 h-3 rounded-full bg-[#9D00FF]" />
-                  </div>
-                  <p className="text-white font-medium">Mentor de Milhares de Alunos</p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[#00FF94]/10 flex items-center justify-center">
-                    <div className="w-3 h-3 rounded-full bg-[#00FF94]" />
-                  </div>
-                  <p className="text-white font-medium">Criador do Método Trajeto das Milhas</p>
-                </div>
-              </div>
+              )}
             </div>
           </motion.div>
         </div>
