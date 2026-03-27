@@ -19,8 +19,8 @@ const AdminPanel: React.FC = () => {
   const { content, updateContent, isAuthReady } = useContent();
   const [activeTab, setActiveTab] = useState('hero');
 
-  const handleSave = () => {
-    updateContent(content);
+  const handleSave = async () => {
+    await updateContent(content);
   };
 
   if (!isAuthReady) {

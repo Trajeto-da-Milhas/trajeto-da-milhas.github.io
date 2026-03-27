@@ -1,20 +1,29 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Save, Download, ExternalLink, Check, Terminal } from 'lucide-react';
+import { Save, Download, ExternalLink, Check, Terminal, Loader2 } from 'lucide-react';
 import { SiteContent } from '../../types';
 
 interface HeaderDevProps {
   content: SiteContent;
-  onSave: () => void;
+  onSave: () => Promise<void>;
 }
 
 const HeaderDev: React.FC<HeaderDevProps> = ({ content, onSave }) => {
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
-    onSave();
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 2000);
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await onSave();
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 2000);
+    } catch (error) {
+      console.error('Erro ao salvar:', error);
+      alert('Erro ao salvar no Firebase. Verifique sua conexão.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleExport = () => {
@@ -58,10 +67,23 @@ const HeaderDev: React.FC<HeaderDevProps> = ({ content, onSave }) => {
         </button>
         <button 
           onClick={handleSave}
-          className="relative flex items-center gap-2 px-6 py-2 bg-[#00D4FF] text-[#050A14] rounded-lg font-black text-xs hover:shadow-[0_0_30px_rgba(0,212,255,0.5)] transition-all transform hover:scale-105 overflow-hidden"
+          disabled={isSaving}
+          className={`relative flex items-center gap-2 px-6 py-2 rounded-lg font-black text-xs transition-all transform overflow-hidden ${
+            isSaving ? 'bg-gray-600 cursor-not-allowed' : 'bg-[#00D4FF] text-[#050A14] hover:shadow-[0_0_30px_rgba(0,212,255,0.5)] hover:scale-105'
+          }`}
         >
           <AnimatePresence mode="wait">
-            {showSuccess ? (
+            {isSaving ? (
+              <motion.div 
+                key="saving"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-2"
+              >
+                <Loader2 className="animate-spin" size={14} /> SALVANDO...
+              </motion.div>
+            ) : showSuccess ? (
               <motion.div 
                 key="success"
                 initial={{ y: 20, opacity: 0 }}
@@ -69,7 +91,7 @@ const HeaderDev: React.FC<HeaderDevProps> = ({ content, onSave }) => {
                 exit={{ y: -20, opacity: 0 }}
                 className="flex items-center gap-2"
               >
-                <Check size={14} /> SALVO!
+                <Check size={14} /> SALVO NO FIREBASE!
               </motion.div>
             ) : (
               <motion.div 
@@ -79,7 +101,7 @@ const HeaderDev: React.FC<HeaderDevProps> = ({ content, onSave }) => {
                 exit={{ y: -20, opacity: 0 }}
                 className="flex items-center gap-2"
               >
-                <Save size={14} /> SALVAR NO NAVEGADOR
+                <Save size={14} /> SALVAR NO SITE
               </motion.div>
             )}
           </AnimatePresence>
