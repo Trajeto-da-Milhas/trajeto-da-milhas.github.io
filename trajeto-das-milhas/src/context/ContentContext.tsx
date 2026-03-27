@@ -10,6 +10,7 @@ interface ContentContextType {
   updateContent: (newContent: SiteContent) => Promise<void>;
   user: User | null;
   isAuthReady: boolean;
+  isContentReady: boolean;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
@@ -18,6 +19,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [content, setContent] = useState<SiteContent>(defaultContent);
   const [user, setUser] = useState<User | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
+  const [isContentReady, setIsContentReady] = useState(false);
 
   // Listen for Auth changes
   useEffect(() => {
@@ -38,13 +40,18 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
         const data = snapshot.data() as SiteContent;
         console.log("Dados recebidos do Firestore:", data);
         setContent(data);
+        setIsContentReady(true);
       } else {
         console.log("Nenhum dado encontrado no Firestore, usando padrão.");
         // Inicializar o banco se estiver vazio
-        setDoc(contentDoc, defaultContent).catch(err => console.error("Erro ao inicializar Firestore:", err));
+        setDoc(contentDoc, defaultContent)
+          .then(() => setIsContentReady(true))
+          .catch(err => console.error("Erro ao inicializar Firestore:", err));
       }
     }, (error) => {
       console.error("Erro crítico no Firestore (onSnapshot):", error);
+      // Em caso de erro, pelo menos libera o conteúdo padrão para não travar em loading infinito
+      setIsContentReady(true);
     });
 
     return () => unsubscribe();
@@ -68,7 +75,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   return (
-    <ContentContext.Provider value={{ content, updateContent, user, isAuthReady }}>
+    <ContentContext.Provider value={{ content, updateContent, user, isAuthReady, isContentReady }}>
       {children}
     </ContentContext.Provider>
   );
