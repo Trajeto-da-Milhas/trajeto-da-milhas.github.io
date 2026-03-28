@@ -50,6 +50,13 @@ const HeroEditor: React.FC = () => {
       />
 
       <TextAreaField 
+        label="Título Principal (Mobile)" 
+        value={hero.titleMobile || hero.title} 
+        onChange={(val) => handleChange('titleMobile', val)}
+        placeholder="Título otimizado para dispositivos móveis (deixe em branco para usar o título principal)"
+      />
+
+      <TextAreaField 
         label="Subtítulo" 
         value={hero.subtitle} 
         onChange={(val) => handleChange('subtitle', val)}

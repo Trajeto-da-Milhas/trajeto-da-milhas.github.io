@@ -58,7 +58,8 @@ const Hero: React.FC = () => {
           >
             <h1 className="text-3xl md:text-7xl font-black mb-6 leading-tight tracking-tight whitespace-pre-line">
               <span className="bg-gradient-to-r from-[#00D4FF] to-[#7B2FFF] bg-clip-text text-transparent">
-                {content.hero.title}
+                <span className="md:hidden">{content.hero.titleMobile || content.hero.title}</span>
+                <span className="hidden md:inline">{content.hero.title}</span>
               </span>
             </h1>
             <p className="text-base md:text-2xl text-[#8BA3C0] max-w-4xl mx-auto mb-10 leading-relaxed">

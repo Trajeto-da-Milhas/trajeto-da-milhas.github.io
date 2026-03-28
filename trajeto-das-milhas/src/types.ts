@@ -2,6 +2,7 @@ export interface SiteContent {
   hero: {
     badge: string;
     title: string;
+    titleMobile?: string;
     subtitle: string;
     videoUrl: string;
     ctaText: string;

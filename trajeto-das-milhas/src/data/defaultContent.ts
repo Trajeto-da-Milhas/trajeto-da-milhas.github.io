@@ -4,6 +4,7 @@ export const defaultContent: SiteContent = {
   hero: {
     badge: "🔥 Vagas Limitadas",
     title: "Viaje em Classe Executiva Pagando Preço de Econômica",
+    titleMobile: "Viaje em Classe Executiva Pagando Preço de Econômica",
     subtitle: "Receba diariamente as melhores promoções e emissões de passagens aéreas em primeira classe e executiva para os destinos mais desejados do mundo.",
     videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Placeholder video
     ctaText: "Entrar no Grupo VIP",
