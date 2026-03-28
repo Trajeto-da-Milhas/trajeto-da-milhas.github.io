@@ -4,7 +4,7 @@ import InputField from './InputField';
 import TextAreaField from './TextAreaField';
 import VideoUpload from './VideoUpload';
 import EditorSection from './EditorSection';
-import { Play, Link, Award, BarChart3, Users, Eye, Clock, Zap, TrendingUp, Percent, AlertCircle } from 'lucide-react';
+import { Play, Link, Award, BarChart3, Eye, Clock, Zap, TrendingUp, Percent, AlertCircle } from 'lucide-react';
 import { getVideoMetrics } from '../../services/videoAnalytics';
 import type { VideoMetrics } from '../../services/videoAnalytics';
 
@@ -23,6 +23,7 @@ const HeroEditor: React.FC = () => {
       
       getVideoMetrics(hero.videoUrl)
         .then((data) => {
+          // Apenas o que vier do banco de dados real
           setMetrics(data);
           setIsLoadingMetrics(false);
         })
@@ -125,14 +126,14 @@ const HeroEditor: React.FC = () => {
             icon={<Link size={14} />}
           />
 
-          {/* Video Metrics Section - REAL TIME FROM SUPABASE */}
+          {/* Video Metrics Section - 100% REAL FROM SUPABASE */}
           <div className="p-6 bg-[#0A1221] border border-[#00D4FF]/20 rounded-2xl">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2 text-[#00D4FF] font-black text-xs uppercase tracking-widest">
-                <BarChart3 size={16} /> MÉTRICAS DO VÍDEO (TEMPO REAL)
+                <BarChart3 size={16} /> MÉTRICAS REAIS DO VÍDEO
               </div>
               {isLoadingMetrics && (
-                <div className="text-[10px] text-[#8BA3C0] animate-pulse">Atualizando...</div>
+                <div className="text-[10px] text-[#8BA3C0] animate-pulse">Consultando Banco...</div>
               )}
             </div>
             
@@ -150,7 +151,7 @@ const HeroEditor: React.FC = () => {
                     <Eye size={12} /> Visualizações
                   </div>
                   <div className="text-xl font-black text-white">{metrics.totalViews.toLocaleString()}</div>
-                  <div className="text-[10px] text-green-500 font-bold">Total de plays</div>
+                  <div className="text-[10px] text-green-500 font-bold">Plays Reais</div>
                 </div>
                 
                 <div className="p-4 bg-[#0D1526] rounded-xl border border-white/5 hover:border-[#00D4FF]/30 transition-colors">
@@ -158,7 +159,7 @@ const HeroEditor: React.FC = () => {
                     <Percent size={12} /> Retenção Média
                   </div>
                   <div className="text-xl font-black text-white">{metrics.averageRetention}%</div>
-                  <div className="text-[10px] text-[#00D4FF] font-bold">{metrics.completedViews} completados</div>
+                  <div className="text-[10px] text-[#00D4FF] font-bold">{metrics.completedViews} Terminaram</div>
                 </div>
 
                 <div className="p-4 bg-[#0D1526] rounded-xl border border-white/5 hover:border-[#00D4FF]/30 transition-colors">
@@ -166,20 +167,20 @@ const HeroEditor: React.FC = () => {
                     <Clock size={12} /> Tempo Médio
                   </div>
                   <div className="text-xl font-black text-white">{Math.floor(metrics.averageWatchTime / 60)}:{String(metrics.averageWatchTime % 60).padStart(2, '0')}</div>
-                  <div className="text-[10px] text-[#8BA3C0] font-bold">Média por view</div>
+                  <div className="text-[10px] text-[#8BA3C0] font-bold">Duração Média</div>
                 </div>
 
                 <div className="p-4 bg-[#0D1526] rounded-xl border border-white/5 hover:border-[#00D4FF]/30 transition-colors">
                   <div className="flex items-center gap-2 text-[#8BA3C0] text-[10px] uppercase font-bold mb-1">
-                    <TrendingUp size={12} /> CTR (Conversão)
+                    <Zap size={12} /> Cliques no CTA
                   </div>
                   <div className="text-xl font-black text-[#00FF94]">{metrics.ctaClicks}</div>
-                  <div className="text-[10px] text-[#00FF94] font-bold">{metrics.ctr.toFixed(1)}% de conversão</div>
+                  <div className="text-[10px] text-[#00FF94] font-bold">{metrics.ctr.toFixed(1)}% Conversão</div>
                 </div>
               </div>
             ) : (
               <div className="text-center py-8 text-[#8BA3C0]">
-                <p className="text-sm">Nenhum vídeo selecionado. Configure a URL do vídeo acima para ver as métricas.</p>
+                <p className="text-sm">Aguardando dados reais do banco de dados...</p>
               </div>
             )}
           </div>
