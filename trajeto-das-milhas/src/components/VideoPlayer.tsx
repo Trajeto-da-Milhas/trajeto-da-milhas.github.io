@@ -10,40 +10,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, title = 'Video' }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true); // Começa mutado para garantir autoplay
+  const [isMuted, setIsMuted] = useState(true);
+  const [isBlurred, setIsBlurred] = useState(true); // Começa desfocado
+  const [hasStartedByUser, setHasStartedByUser] = useState(false); // Rastreia se o usuário clicou no botão
 
-  // Efeito para ativar o som no primeiro clique do usuário em QUALQUER LUGAR da página
-  useEffect(() => {
-    const enableAudio = () => {
-      if (videoRef.current) {
-        videoRef.current.muted = false;
-        setIsMuted(false);
-        // Tenta tocar novamente para garantir que o áudio foi liberado pelo navegador
-        videoRef.current.play().catch(e => console.log("Erro ao tocar após clique:", e));
-      }
-      // Remove o ouvinte após a primeira interação
-      window.removeEventListener('click', enableAudio);
-      window.removeEventListener('touchstart', enableAudio);
-    };
-
-    window.addEventListener('click', enableAudio);
-    window.addEventListener('touchstart', enableAudio);
-
-    return () => {
-      window.removeEventListener('click', enableAudio);
-      window.removeEventListener('touchstart', enableAudio);
-    };
-  }, []);
-
-  // Intersection Observer para autoplay quando entra na viewport
+  // Intersection Observer para autoplay mutado quando entra na viewport
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (videoRef.current) {
           if (entry.isIntersecting) {
-            // Tenta tocar (geralmente mutado no início devido às políticas do navegador)
+            // Garante que o vídeo começa mutado e desfocado
+            videoRef.current.muted = true;
+            videoRef.current.currentTime = 0;
             videoRef.current.play().catch((error) => {
-              console.log('Autoplay bloqueado, tentando novamente...', error);
+              console.log('Autoplay bloqueado:', error);
             });
           } else {
             videoRef.current.pause();
@@ -63,6 +44,29 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, title = 'Video' }) => {
       }
     };
   }, []);
+
+  // Quando o usuário clica no botão de play central
+  const handlePlayButtonClick = () => {
+    if (videoRef.current) {
+      // Reinicia o vídeo do zero
+      videoRef.current.currentTime = 0;
+      
+      // Remove o desfoque
+      setIsBlurred(false);
+      
+      // Ativa o som
+      videoRef.current.muted = false;
+      setIsMuted(false);
+      
+      // Marca que o usuário iniciou
+      setHasStartedByUser(true);
+      
+      // Toca o vídeo
+      videoRef.current.play().catch((error) => {
+        console.log('Erro ao tocar vídeo:', error);
+      });
+    }
+  };
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -106,53 +110,70 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, title = 'Video' }) => {
         ref={videoRef}
         src={src}
         title={title}
-        className="w-full h-full object-cover"
+        className={`w-full h-full object-cover transition-all duration-300 ${
+          isBlurred ? 'blur-lg' : ''
+        }`}
         onPlay={handleVideoPlay}
         onPause={handleVideoPause}
-        loop
+        loop={hasStartedByUser} // Loop apenas após o usuário clicar
         playsInline
         muted={isMuted}
         autoPlay
       />
 
-      {/* Custom Controls */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <div className="flex items-center justify-between">
+      {/* Botão de Play Central (Aparece quando está desfocado) */}
+      {isBlurred && (
+        <div className="absolute inset-0 flex items-center justify-center z-10 bg-black/30">
           <button
-            onClick={togglePlay}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-            aria-label={isPlaying ? 'Pausar' : 'Tocar'}
+            onClick={handlePlayButtonClick}
+            className="p-6 bg-[#00D4FF] text-[#050A14] rounded-full hover:shadow-[0_0_40px_rgba(0,212,255,0.8)] transition-all transform hover:scale-110 animate-pulse"
+            aria-label="Tocar Vídeo"
           >
-            {isPlaying ? (
-              <Pause className="w-6 h-6 text-white" />
-            ) : (
-              <Play className="w-6 h-6 text-white" />
-            )}
-          </button>
-
-          <div className="flex-1" />
-
-          <button
-            onClick={toggleMute}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors mr-2"
-            aria-label={isMuted ? 'Ativar Som' : 'Mutar'}
-          >
-            {isMuted ? (
-              <VolumeX className="w-6 h-6 text-white" />
-            ) : (
-              <Volume2 className="w-6 h-6 text-white" />
-            )}
-          </button>
-
-          <button
-            onClick={toggleFullscreen}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-            aria-label="Tela Cheia"
-          >
-            <Maximize className="w-6 h-6 text-white" />
+            <Play className="w-12 h-12 fill-current" />
           </button>
         </div>
-      </div>
+      )}
+
+      {/* Custom Controls (Aparecem ao passar o mouse quando o vídeo está em foco) */}
+      {!isBlurred && (
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={togglePlay}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              aria-label={isPlaying ? 'Pausar' : 'Tocar'}
+            >
+              {isPlaying ? (
+                <Pause className="w-6 h-6 text-white" />
+              ) : (
+                <Play className="w-6 h-6 text-white" />
+              )}
+            </button>
+
+            <div className="flex-1" />
+
+            <button
+              onClick={toggleMute}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors mr-2"
+              aria-label={isMuted ? 'Ativar Som' : 'Mutar'}
+            >
+              {isMuted ? (
+                <VolumeX className="w-6 h-6 text-white" />
+              ) : (
+                <Volume2 className="w-6 h-6 text-white" />
+              )}
+            </button>
+
+            <button
+              onClick={toggleFullscreen}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              aria-label="Tela Cheia"
+            >
+              <Maximize className="w-6 h-6 text-white" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
