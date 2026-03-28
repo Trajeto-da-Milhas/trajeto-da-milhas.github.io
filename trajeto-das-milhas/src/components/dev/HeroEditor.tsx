@@ -88,33 +88,35 @@ const HeroEditor: React.FC = () => {
         placeholder="Uma breve descrição persuasiva"
       />
 
-      {/* Grid Principal de Vídeo e Métricas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        {/* Coluna da Esquerda: URL e Upload Direto */}
-        <div className="flex flex-col gap-6">
-          <InputField 
-            label="URL do Vídeo (YouTube Embed ou Link Direto)" 
-            value={hero.videoUrl} 
-            onChange={(val) => handleChange('videoUrl', val)}
-            placeholder="https://www.youtube.com/embed/..."
-            icon={<Play size={14} />}
-            preview={
-              <div className="w-full h-full bg-black rounded-lg overflow-hidden flex items-center justify-center">
-                {hero.videoUrl.includes('youtube.com') || hero.videoUrl.includes('youtu.be') ? (
-                  <iframe 
-                    src={hero.videoUrl} 
-                    className="w-full h-full" 
-                    title="Preview"
-                  />
-                ) : (
-                  <video src={hero.videoUrl} controls className="w-full h-full object-contain" />
-                )}
-              </div>
-            }
-          />
-          
-          {/* VideoUpload agora está DENTRO da coluna da esquerda, ocupando o espaço vazio */}
+      {/* GRID PRINCIPAL: VÍDEO E MÉTRICAS */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start mt-4">
+        {/* COLUNA ESQUERDA: URL + UPLOAD DIRETO (OCUPANDO O ESPAÇO VAZIO) */}
+        <div className="flex flex-col gap-6 h-full">
           <div className="w-full">
+            <InputField 
+              label="URL do Vídeo (YouTube Embed ou Link Direto)" 
+              value={hero.videoUrl} 
+              onChange={(val) => handleChange('videoUrl', val)}
+              placeholder="https://www.youtube.com/embed/..."
+              icon={<Play size={14} />}
+              preview={
+                <div className="w-full h-full bg-black rounded-lg overflow-hidden flex items-center justify-center">
+                  {hero.videoUrl.includes('youtube.com') || hero.videoUrl.includes('youtu.be') ? (
+                    <iframe 
+                      src={hero.videoUrl} 
+                      className="w-full h-full" 
+                      title="Preview"
+                    />
+                  ) : (
+                    <video src={hero.videoUrl} controls className="w-full h-full object-contain" />
+                  )}
+                </div>
+              }
+            />
+          </div>
+          
+          {/* VIDEO UPLOAD POSICIONADO EXPLICITAMENTE ABAIXO DA URL */}
+          <div className="w-full mt-auto">
             <VideoUpload 
               onUploadSuccess={(url) => handleChange('videoUrl', url)} 
               label="Fazer Upload de Vídeo Direto" 
@@ -122,18 +124,20 @@ const HeroEditor: React.FC = () => {
           </div>
         </div>
         
-        {/* Coluna da Direita: Link CTA e Métricas */}
+        {/* COLUNA DIREITA: LINK CTA + MÉTRICAS */}
         <div className="flex flex-col gap-6">
-          <InputField 
-            label="Link do Botão (CTA)" 
-            value={hero.ctaLink} 
-            onChange={(val) => handleChange('ctaLink', val)}
-            placeholder="#pricing"
-            icon={<Link size={14} />}
-          />
+          <div className="w-full">
+            <InputField 
+              label="Link do Botão (CTA)" 
+              value={hero.ctaLink} 
+              onChange={(val) => handleChange('ctaLink', val)}
+              placeholder="#pricing"
+              icon={<Link size={14} />}
+            />
+          </div>
 
-          {/* Video Metrics Section */}
-          <div className="p-6 bg-[#0A1221] border border-[#00D4FF]/20 rounded-2xl">
+          {/* PAINEL DE MÉTRICAS */}
+          <div className="p-6 bg-[#0A1221] border border-[#00D4FF]/20 rounded-2xl shadow-lg">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2 text-[#00D4FF] font-black text-xs uppercase tracking-widest">
                 <BarChart3 size={16} /> MÉTRICAS REAIS DO VÍDEO
@@ -193,7 +197,7 @@ const HeroEditor: React.FC = () => {
         </div>
       </div>
 
-      <div className="space-y-6 mt-8">
+      <div className="space-y-6 mt-12">
         <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[#00D4FF] font-bold">
           <Award size={14} /> ESTATÍSTICAS (STATS)
         </div>
