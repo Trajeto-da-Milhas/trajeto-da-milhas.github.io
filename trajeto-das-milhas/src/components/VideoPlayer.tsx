@@ -166,7 +166,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, title = 'Video' }) => {
             {[0, 1, 2].map((index) => (
               <motion.div
                 key={index}
-                className="absolute rounded-full border border-[#00D4FF]"
+                className="absolute rounded-full border border-[#00D4FF] bg-[#00D4FF]/20"
                 initial={{ width: 96, height: 96, opacity: 0.5, scale: 1 }}
                 animate={{
                   scale: [1, 2.5],
@@ -176,7 +176,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, title = 'Video' }) => {
                   duration: 2,
                   repeat: Infinity,
                   delay: index * 0.6,
-                  ease: [0.21, 0.53, 0.56, 0.8],
+                  ease: "linear",
                 }}
               />
             ))}
