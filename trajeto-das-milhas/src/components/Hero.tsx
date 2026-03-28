@@ -92,7 +92,7 @@ const Hero: React.FC = () => {
               >
                 <Zap className="w-6 h-6 flex-shrink-0" />
                 <span className="flex flex-col md:block text-left md:text-center leading-tight md:leading-normal">
-                  <span className="md:hidden">Quero Garantir<br />Minha Vaga</span>
+                  <span className="md:hidden">Entrar no<br />Grupo VIP</span>
                   <span className="hidden md:inline">{content.hero.ctaText}</span>
                 </span>
               </a>
