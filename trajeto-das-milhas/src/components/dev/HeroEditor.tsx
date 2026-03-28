@@ -4,8 +4,8 @@ import InputField from './InputField';
 import TextAreaField from './TextAreaField';
 import VideoUpload from './VideoUpload';
 import EditorSection from './EditorSection';
-import { Play, Link, Award, BarChart3, Users, Eye, Clock, Zap, TrendingUp, Percent } from 'lucide-react';
-import { getVideoMetrics, generateDemoMetrics } from '../../services/videoAnalytics';
+import { Play, Link, Award, BarChart3, Users, Eye, Clock, Zap, TrendingUp, Percent, AlertCircle } from 'lucide-react';
+import { getVideoMetrics } from '../../services/videoAnalytics';
 import type { VideoMetrics } from '../../services/videoAnalytics';
 
 const HeroEditor: React.FC = () => {
@@ -13,23 +13,24 @@ const HeroEditor: React.FC = () => {
   const { hero } = draft;
   const [metrics, setMetrics] = useState<VideoMetrics | null>(null);
   const [isLoadingMetrics, setIsLoadingMetrics] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Carregar métricas quando o vídeo mudar
+  // Carregar métricas REAIS quando o vídeo mudar
   useEffect(() => {
     if (hero.videoUrl) {
       setIsLoadingMetrics(true);
-      // Simular carregamento
-      setTimeout(() => {
-        const videoMetrics = getVideoMetrics(hero.videoUrl);
-        // Se não há dados, gerar dados de demonstração
-        if (videoMetrics.totalViews === 0) {
-          const demoMetrics = generateDemoMetrics(hero.videoUrl);
-          setMetrics(demoMetrics);
-        } else {
-          setMetrics(videoMetrics);
-        }
-        setIsLoadingMetrics(false);
-      }, 300);
+      setError(null);
+      
+      getVideoMetrics(hero.videoUrl)
+        .then((data) => {
+          setMetrics(data);
+          setIsLoadingMetrics(false);
+        })
+        .catch((err) => {
+          console.error('Erro ao carregar métricas:', err);
+          setError('Não foi possível carregar as métricas. Verifique se o Supabase está configurado.');
+          setIsLoadingMetrics(false);
+        });
     }
   }, [hero.videoUrl]);
 
@@ -124,7 +125,7 @@ const HeroEditor: React.FC = () => {
             icon={<Link size={14} />}
           />
 
-          {/* Video Metrics Section - REAL TIME */}
+          {/* Video Metrics Section - REAL TIME FROM SUPABASE */}
           <div className="p-6 bg-[#0A1221] border border-[#00D4FF]/20 rounded-2xl">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2 text-[#00D4FF] font-black text-xs uppercase tracking-widest">
@@ -134,6 +135,13 @@ const HeroEditor: React.FC = () => {
                 <div className="text-[10px] text-[#8BA3C0] animate-pulse">Atualizando...</div>
               )}
             </div>
+            
+            {error && (
+              <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-3 mb-4">
+                <AlertCircle size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-red-400">{error}</div>
+              </div>
+            )}
             
             {metrics ? (
               <div className="grid grid-cols-2 gap-4">
@@ -149,7 +157,7 @@ const HeroEditor: React.FC = () => {
                   <div className="flex items-center gap-2 text-[#8BA3C0] text-[10px] uppercase font-bold mb-1">
                     <Percent size={12} /> Retenção Média
                   </div>
-                  <div className="text-xl font-black text-white">{Math.round(metrics.averageRetention)}%</div>
+                  <div className="text-xl font-black text-white">{metrics.averageRetention}%</div>
                   <div className="text-[10px] text-[#00D4FF] font-bold">{metrics.completedViews} completados</div>
                 </div>
 
