@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
+import { motion } from 'framer-motion';
 import {
   trackBlurView,
   trackVideoPlay,
@@ -160,13 +161,35 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, title = 'Video' }) => {
       {/* Botão de Play Central (Aparece quando está desfocado) */}
       {isBlurred && (
         <div className="absolute inset-0 flex items-center justify-center z-10 bg-black/30">
-          <button
-            onClick={handlePlayButtonClick}
-            className="p-6 bg-[#00D4FF] text-[#050A14] rounded-full hover:shadow-[0_0_40px_rgba(0,212,255,0.8)] transition-all transform hover:scale-110 animate-pulse"
-            aria-label="Tocar Vídeo"
-          >
-            <Play className="w-12 h-12 fill-current" />
-          </button>
+          <div className="relative flex items-center justify-center">
+            {/* Círculos de Pulso (Outline) */}
+            {[1, 2, 3].map((index) => (
+              <motion.div
+                key={index}
+                className="absolute border-2 border-[#00D4FF] rounded-full"
+                initial={{ width: 80, height: 80, opacity: 0.8 }}
+                animate={{
+                  width: [80, 200],
+                  height: [80, 200],
+                  opacity: [0.8, 0],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  delay: (index - 1) * 0.6,
+                  ease: "easeOut",
+                }}
+              />
+            ))}
+            
+            <button
+              onClick={handlePlayButtonClick}
+              className="relative p-6 bg-[#00D4FF] text-[#050A14] rounded-full hover:shadow-[0_0_40px_rgba(0,212,255,0.8)] transition-all transform hover:scale-110 z-20"
+              aria-label="Tocar Vídeo"
+            >
+              <Play className="w-12 h-12 fill-current" />
+            </button>
+          </div>
         </div>
       )}
 
