@@ -6,7 +6,7 @@ const Hero: React.FC = () => {
   const { content } = useContent();
 
   return (
-    <section className="relative flex flex-col items-center justify-start pt-8 md:pt-12 pb-16 overflow-hidden">
+    <section className="relative flex flex-col items-center justify-start pt-4 md:pt-6 pb-12 overflow-hidden">
       {/* Dot Grid Background */}
       <div className="absolute inset-0 z-0 opacity-20" 
            style={{ backgroundImage: 'radial-gradient(circle, #00D4FF 1px, transparent 1px)', backgroundSize: '30px 30px' }}>
@@ -19,24 +19,24 @@ const Hero: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <span className="inline-block px-4 py-1 rounded-full bg-[#00D4FF]/10 border border-[#00D4FF]/20 text-[#00D4FF] text-sm font-bold mb-4 animate-pulse">
+          <span className="inline-block px-4 py-1 rounded-full bg-[#00D4FF]/10 border border-[#00D4FF]/20 text-[#00D4FF] text-sm font-bold mb-2 animate-pulse">
             {content.hero.badge}
           </span>
-          <h1 className="text-4xl md:text-7xl font-black mb-4 leading-tight tracking-tight">
+          <h1 className="text-4xl md:text-7xl font-black mb-2 leading-tight tracking-tight">
             <span className="bg-gradient-to-r from-[#00D4FF] to-[#7B2FFF] bg-clip-text text-transparent">
               {content.hero.title}
             </span>
           </h1>
-          <p className="text-[#8BA3C0] text-lg md:text-xl max-w-2xl mx-auto mb-8">
+          <p className="text-[#8BA3C0] text-lg md:text-xl max-w-2xl mx-auto mb-6">
             {content.hero.subtitle}
           </p>
           
-          {/* Video Embed - Restored to Original Large Size */}
+          {/* Video Embed - Original Large Size with reduced margin */}
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, duration: 0.8 }}
-            className="max-w-4xl mx-auto aspect-video rounded-2xl overflow-hidden border-2 border-[#00D4FF]/20 shadow-[0_0_50px_rgba(0,212,255,0.1)] mb-10"
+            className="max-w-4xl mx-auto aspect-video rounded-2xl overflow-hidden border-2 border-[#00D4FF]/20 shadow-[0_0_50px_rgba(0,212,255,0.1)] mb-8"
           >
             <iframe 
               width="100%" 
