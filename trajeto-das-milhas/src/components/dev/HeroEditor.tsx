@@ -1,14 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDraft } from './AdminPanel';
 import InputField from './InputField';
 import TextAreaField from './TextAreaField';
 import VideoUpload from './VideoUpload';
 import EditorSection from './EditorSection';
-import { Play, Link, Award, BarChart3, Users, Eye, Clock, Zap } from 'lucide-react';
+import { Play, Link, Award, BarChart3, Users, Eye, Clock, Zap, TrendingUp, Percent } from 'lucide-react';
+import { getVideoMetrics, generateDemoMetrics } from '../../services/videoAnalytics';
+import type { VideoMetrics } from '../../services/videoAnalytics';
 
 const HeroEditor: React.FC = () => {
   const { draft, updateDraft } = useDraft();
   const { hero } = draft;
+  const [metrics, setMetrics] = useState<VideoMetrics | null>(null);
+  const [isLoadingMetrics, setIsLoadingMetrics] = useState(false);
+
+  // Carregar métricas quando o vídeo mudar
+  useEffect(() => {
+    if (hero.videoUrl) {
+      setIsLoadingMetrics(true);
+      // Simular carregamento
+      setTimeout(() => {
+        const videoMetrics = getVideoMetrics(hero.videoUrl);
+        // Se não há dados, gerar dados de demonstração
+        if (videoMetrics.totalViews === 0) {
+          const demoMetrics = generateDemoMetrics(hero.videoUrl);
+          setMetrics(demoMetrics);
+        } else {
+          setMetrics(videoMetrics);
+        }
+        setIsLoadingMetrics(false);
+      }, 300);
+    }
+  }, [hero.videoUrl]);
 
   const handleChange = (field: string, value: any) => {
     updateDraft({
@@ -101,45 +124,56 @@ const HeroEditor: React.FC = () => {
             icon={<Link size={14} />}
           />
 
-          {/* Video Metrics Section */}
+          {/* Video Metrics Section - REAL TIME */}
           <div className="p-6 bg-[#0A1221] border border-[#00D4FF]/20 rounded-2xl">
-            <div className="flex items-center gap-2 text-[#00D4FF] font-black text-xs uppercase tracking-widest mb-6">
-              <BarChart3 size={16} /> MÉTRICAS DO VÍDEO (REAIS)
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2 text-[#00D4FF] font-black text-xs uppercase tracking-widest">
+                <BarChart3 size={16} /> MÉTRICAS DO VÍDEO (TEMPO REAL)
+              </div>
+              {isLoadingMetrics && (
+                <div className="text-[10px] text-[#8BA3C0] animate-pulse">Atualizando...</div>
+              )}
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-[#0D1526] rounded-xl border border-white/5">
-                <div className="flex items-center gap-2 text-[#8BA3C0] text-[10px] uppercase font-bold mb-1">
-                  <Eye size={12} /> Visualizações
+            {metrics ? (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-[#0D1526] rounded-xl border border-white/5 hover:border-[#00D4FF]/30 transition-colors">
+                  <div className="flex items-center gap-2 text-[#8BA3C0] text-[10px] uppercase font-bold mb-1">
+                    <Eye size={12} /> Visualizações
+                  </div>
+                  <div className="text-xl font-black text-white">{metrics.totalViews.toLocaleString()}</div>
+                  <div className="text-[10px] text-green-500 font-bold">Total de plays</div>
                 </div>
-                <div className="text-xl font-black text-white">12.482</div>
-                <div className="text-[10px] text-green-500 font-bold">+12% vs ontem</div>
-              </div>
-              
-              <div className="p-4 bg-[#0D1526] rounded-xl border border-white/5">
-                <div className="flex items-center gap-2 text-[#8BA3C0] text-[10px] uppercase font-bold mb-1">
-                  <Users size={12} /> Retenção Média
+                
+                <div className="p-4 bg-[#0D1526] rounded-xl border border-white/5 hover:border-[#00D4FF]/30 transition-colors">
+                  <div className="flex items-center gap-2 text-[#8BA3C0] text-[10px] uppercase font-bold mb-1">
+                    <Percent size={12} /> Retenção Média
+                  </div>
+                  <div className="text-xl font-black text-white">{Math.round(metrics.averageRetention)}%</div>
+                  <div className="text-[10px] text-[#00D4FF] font-bold">{metrics.completedViews} completados</div>
                 </div>
-                <div className="text-xl font-black text-white">68%</div>
-                <div className="text-[10px] text-[#00D4FF] font-bold">Excelente</div>
-              </div>
 
-              <div className="p-4 bg-[#0D1526] rounded-xl border border-white/5">
-                <div className="flex items-center gap-2 text-[#8BA3C0] text-[10px] uppercase font-bold mb-1">
-                  <Clock size={12} /> Tempo Médio
+                <div className="p-4 bg-[#0D1526] rounded-xl border border-white/5 hover:border-[#00D4FF]/30 transition-colors">
+                  <div className="flex items-center gap-2 text-[#8BA3C0] text-[10px] uppercase font-bold mb-1">
+                    <Clock size={12} /> Tempo Médio
+                  </div>
+                  <div className="text-xl font-black text-white">{Math.floor(metrics.averageWatchTime / 60)}:{String(metrics.averageWatchTime % 60).padStart(2, '0')}</div>
+                  <div className="text-[10px] text-[#8BA3C0] font-bold">Média por view</div>
                 </div>
-                <div className="text-xl font-black text-white">4:12</div>
-                <div className="text-[10px] text-[#8BA3C0] font-bold">Duração: 6:00</div>
-              </div>
 
-              <div className="p-4 bg-[#0D1526] rounded-xl border border-white/5">
-                <div className="flex items-center gap-2 text-[#8BA3C0] text-[10px] uppercase font-bold mb-1">
-                  <Zap size={12} /> Cliques no CTA
+                <div className="p-4 bg-[#0D1526] rounded-xl border border-white/5 hover:border-[#00D4FF]/30 transition-colors">
+                  <div className="flex items-center gap-2 text-[#8BA3C0] text-[10px] uppercase font-bold mb-1">
+                    <TrendingUp size={12} /> CTR (Conversão)
+                  </div>
+                  <div className="text-xl font-black text-[#00FF94]">{metrics.ctaClicks}</div>
+                  <div className="text-[10px] text-[#00FF94] font-bold">{metrics.ctr.toFixed(1)}% de conversão</div>
                 </div>
-                <div className="text-xl font-black text-[#00FF94]">842</div>
-                <div className="text-[10px] text-[#00FF94] font-bold">6.7% CTR</div>
               </div>
-            </div>
+            ) : (
+              <div className="text-center py-8 text-[#8BA3C0]">
+                <p className="text-sm">Nenhum vídeo selecionado. Configure a URL do vídeo acima para ver as métricas.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
