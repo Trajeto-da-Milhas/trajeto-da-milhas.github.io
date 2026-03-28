@@ -26,11 +26,18 @@ const Hero: React.FC = () => {
               animation-play-state: paused;
             }
           `}</style>
-          <div className="marquee-content flex gap-8">
-            {[...Array(8)].map((_, i) => (
-              <span key={i} className="text-[#00D4FF] font-bold text-sm md:text-base tracking-widest flex items-center gap-2">
-                Vagas Limitadas! <span className="text-[#00D4FF]">•</span> Garanta Já Seu Acesso! <span className="text-[#00D4FF]">•</span>
-              </span>
+          <div className="marquee-content flex">
+            {[...Array(16)].map((_, i) => (
+              <div key={i} className="flex items-center">
+                <span className="text-[#00D4FF] font-bold text-sm md:text-base tracking-widest px-4">
+                  Vagas Limitadas!
+                </span>
+                <span className="text-[#00D4FF]">•</span>
+                <span className="text-[#00D4FF] font-bold text-sm md:text-base tracking-widest px-4">
+                  Garanta Já Seu Acesso!
+                </span>
+                <span className="text-[#00D4FF]">•</span>
+              </div>
             ))}
           </div>
         </div>
