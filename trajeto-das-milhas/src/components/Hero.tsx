@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { useContent } from '../context/ContextContent';
+import { useContent } from '../context/ContentContext';
 
 const Hero: React.FC = () => {
   const { content } = useContent();
