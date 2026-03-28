@@ -111,10 +111,6 @@ const HeroEditor: React.FC = () => {
               </div>
             }
           />
-          <VideoUpload 
-            onUploadSuccess={(url) => handleChange('videoUrl', url)} 
-            label="Fazer Upload de Vídeo" 
-          />
         </div>
         
         <div className="space-y-6">
@@ -185,6 +181,18 @@ const HeroEditor: React.FC = () => {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Separação clara entre URL e Upload Direto */}
+      <div className="border-t border-[#00D4FF]/10 pt-8 mt-8">
+        <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[#00D4FF] font-bold mb-6">
+          <Play size={14} /> OU FAZER UPLOAD DIRETO
+        </div>
+        
+        <VideoUpload 
+          onUploadSuccess={(url) => handleChange('videoUrl', url)} 
+          label="Upload de Vídeo Direto" 
+        />
       </div>
 
       <div className="space-y-6">
