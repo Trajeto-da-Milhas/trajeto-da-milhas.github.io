@@ -42,7 +42,7 @@ const HeroEditor: React.FC = () => {
         />
       </div>
 
-      <InputField 
+      <TextAreaField 
         label="Título Principal" 
         value={hero.title} 
         onChange={(val) => handleChange('title', val)}

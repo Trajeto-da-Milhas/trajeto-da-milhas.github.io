@@ -56,7 +56,7 @@ const Hero: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-3xl md:text-7xl font-black mb-6 leading-tight tracking-tight">
+            <h1 className="text-3xl md:text-7xl font-black mb-6 leading-tight tracking-tight whitespace-pre-line">
               <span className="bg-gradient-to-r from-[#00D4FF] to-[#7B2FFF] bg-clip-text text-transparent">
                 {content.hero.title}
               </span>
