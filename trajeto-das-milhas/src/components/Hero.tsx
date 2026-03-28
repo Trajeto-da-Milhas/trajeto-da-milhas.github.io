@@ -43,7 +43,7 @@ const Hero: React.FC = () => {
         </div>
       </div>
 
-      <section className="relative min-h-[calc(100vh-50px)] flex flex-col items-center justify-center pt-[50px] overflow-hidden">
+      <section className="relative flex flex-col items-center pt-[50px] pb-24 overflow-hidden">
         {/* Dot Grid Background */}
         <div className="absolute inset-0 z-0 opacity-20" 
              style={{ backgroundImage: 'radial-gradient(circle, #00D4FF 1px, transparent 1px)', backgroundSize: '30px 30px' }}>
