@@ -88,8 +88,9 @@ const HeroEditor: React.FC = () => {
         placeholder="Uma breve descrição persuasiva"
       />
 
+      {/* Grid Principal de Vídeo e Métricas */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        {/* Coluna da Esquerda: URL e Upload Direto ocupando o espaço vazio */}
+        {/* Coluna da Esquerda: URL e Upload Direto */}
         <div className="flex flex-col gap-6">
           <InputField 
             label="URL do Vídeo (YouTube Embed ou Link Direto)" 
@@ -112,7 +113,7 @@ const HeroEditor: React.FC = () => {
             }
           />
           
-          {/* O VideoUpload agora está explicitamente dentro da mesma coluna da URL */}
+          {/* VideoUpload agora está DENTRO da coluna da esquerda, ocupando o espaço vazio */}
           <div className="w-full">
             <VideoUpload 
               onUploadSuccess={(url) => handleChange('videoUrl', url)} 
