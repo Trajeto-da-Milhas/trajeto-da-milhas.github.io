@@ -6,8 +6,8 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 // Criar cliente Supabase padrão para máxima compatibilidade
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Tipos de eventos
-export type VideoEventType = 'play' | 'pause' | 'ended' | 'cta_click';
+// Tipos de eventos expandidos
+export type VideoEventType = 'play' | 'pause' | 'ended' | 'cta_click' | 'blur_view';
 
 export interface VideoEvent {
   id?: string;
@@ -16,7 +16,17 @@ export interface VideoEvent {
   watched_seconds?: number;
   total_duration?: number;
   user_session_id: string;
+  device_type?: string;
+  browser_info?: string;
   created_at?: string;
+}
+
+export interface RetentionEvent {
+  video_url: string;
+  user_session_id: string;
+  current_time: number;
+  total_duration: number;
+  device_type?: string;
 }
 
 // Gerar ID de sessão único para o usuário
@@ -27,6 +37,27 @@ export const getSessionId = (): string => {
     localStorage.setItem('trajeto_session_id', sessionId);
   }
   return sessionId;
+};
+
+// Detectar tipo de dispositivo
+export const getDeviceType = (): string => {
+  const ua = navigator.userAgent;
+  if (/mobile|android|iphone|ipod|blackberry|iemobile|opera mini/i.test(ua.toLowerCase())) {
+    return 'mobile';
+  } else if (/ipad|android|tablet/i.test(ua.toLowerCase())) {
+    return 'tablet';
+  }
+  return 'desktop';
+};
+
+// Obter informações do navegador
+export const getBrowserInfo = (): string => {
+  const ua = navigator.userAgent;
+  if (ua.indexOf('Firefox') > -1) return 'Firefox';
+  if (ua.indexOf('Chrome') > -1) return 'Chrome';
+  if (ua.indexOf('Safari') > -1) return 'Safari';
+  if (ua.indexOf('Edge') > -1) return 'Edge';
+  return 'Unknown';
 };
 
 // Registrar evento de vídeo no Supabase (com tratamento silencioso de erros)
@@ -40,21 +71,81 @@ export const trackVideoEvent = async (event: VideoEvent) => {
         {
           ...event,
           user_session_id: event.user_session_id || getSessionId(),
+          device_type: event.device_type || getDeviceType(),
+          browser_info: event.browser_info || getBrowserInfo(),
           created_at: new Date().toISOString(),
         }
       ])
       .select();
 
     if (error) {
-      // Log silencioso - não mostra erro ao usuário
-      console.debug('Analytics: Evento não registrado (conexão indisponível)', error.message);
+      console.debug('Analytics: Evento não registrado', error.message);
       return null;
     }
 
     return data;
   } catch (err) {
-    // Falha silenciosa - não interrompe a experiência do usuário
-    console.debug('Analytics: Erro de conexão (esperado em algumas situações)', err);
+    console.debug('Analytics: Erro de conexão', err);
+    return null;
+  }
+};
+
+// Registrar evento de retenção (segundo a segundo)
+export const trackRetentionEvent = async (event: RetentionEvent) => {
+  if (!supabaseUrl || !supabaseAnonKey) return null;
+  
+  try {
+    const { data, error } = await supabase
+      .from('video_retention')
+      .insert([
+        {
+          video_url: event.video_url,
+          user_session_id: event.user_session_id || getSessionId(),
+          current_time: event.current_time,
+          total_duration: event.total_duration,
+          device_type: event.device_type || getDeviceType(),
+          created_at: new Date().toISOString(),
+        }
+      ])
+      .select();
+
+    if (error) {
+      console.debug('Analytics: Retenção não registrada', error.message);
+      return null;
+    }
+
+    return data;
+  } catch (err) {
+    console.debug('Analytics: Erro ao registrar retenção', err);
+    return null;
+  }
+};
+
+// Atualizar sessão de usuário
+export const updateUserSession = async (sessionId: string, videoUrl: string, updates: any) => {
+  if (!supabaseUrl || !supabaseAnonKey) return null;
+  
+  try {
+    const { data, error } = await supabase
+      .from('user_sessions')
+      .upsert({
+        session_id: sessionId,
+        video_url: videoUrl,
+        device_type: getDeviceType(),
+        browser_info: getBrowserInfo(),
+        ...updates,
+        created_at: new Date().toISOString(),
+      })
+      .select();
+
+    if (error) {
+      console.debug('Analytics: Sessão não atualizada', error.message);
+      return null;
+    }
+
+    return data;
+  } catch (err) {
+    console.debug('Analytics: Erro ao atualizar sessão', err);
     return null;
   }
 };
@@ -64,71 +155,100 @@ export const getVideoMetrics = async (videoUrl: string) => {
   if (!supabaseUrl || !supabaseAnonKey) return null;
 
   try {
-    // Total de visualizações (plays)
-    const { count: totalViews, error: error1 } = await supabase
-      .from('video_events')
-      .select('*', { count: 'exact', head: true })
+    // Usar a view video_metrics_summary para obter dados agregados
+    const { data, error } = await supabase
+      .from('video_metrics_summary')
+      .select('*')
       .eq('video_url', videoUrl)
-      .eq('event_type', 'play');
+      .single();
 
-    if (error1) throw error1;
-
-    // Total de conclusões (ended)
-    const { count: completedViews, error: error2 } = await supabase
-      .from('video_events')
-      .select('*', { count: 'exact', head: true })
-      .eq('video_url', videoUrl)
-      .eq('event_type', 'ended');
-
-    if (error2) throw error2;
-
-    // Total de cliques no CTA
-    const { count: ctaClicks, error: error3 } = await supabase
-      .from('video_events')
-      .select('*', { count: 'exact', head: true })
-      .eq('video_url', videoUrl)
-      .eq('event_type', 'cta_click');
-
-    if (error3) throw error3;
-
-    // Calcular tempo médio assistido
-    const { data: watchedData, error: error4 } = await supabase
-      .from('video_events')
-      .select('watched_seconds, total_duration')
-      .eq('video_url', videoUrl)
-      .eq('event_type', 'ended');
-
-    if (error4) throw error4;
-
-    let averageWatchTime = 0;
-    let averageRetention = 0;
-
-    if (watchedData && watchedData.length > 0) {
-      const totalWatched = watchedData.reduce((sum, event) => sum + (event.watched_seconds || 0), 0);
-      averageWatchTime = Math.round(totalWatched / watchedData.length);
-
-      const retentions = watchedData.map(event => 
-        ((event.watched_seconds || 0) / (event.total_duration || 1)) * 100
-      );
-      averageRetention = retentions.reduce((sum, r) => sum + r, 0) / retentions.length;
+    if (error) {
+      console.debug('Analytics: Métricas indisponíveis', error.message);
+      return null;
     }
-
-    const ctr = totalViews && totalViews > 0 ? ((ctaClicks || 0) / totalViews) * 100 : 0;
 
     return {
       videoUrl,
-      totalViews: totalViews || 0,
-      completedViews: completedViews || 0,
-      averageWatchTime,
-      ctaClicks: ctaClicks || 0,
-      ctr: Math.round(ctr * 10) / 10,
-      averageRetention: Math.round(averageRetention),
+      blurViews: data?.blur_views || 0,
+      totalViews: data?.play_clicks || 0,
+      completedViews: data?.completed_views || 0,
+      averageWatchTime: data?.avg_watch_time || 0,
+      ctaClicks: data?.cta_clicks || 0,
+      ctr: data?.ctr_percentage || 0,
+      averageRetention: data?.avg_retention_percentage || 0,
       lastUpdated: new Date().toISOString(),
     };
   } catch (err) {
-    // Retorna zero em vez de erro - garante que o painel não quebra
-    console.debug('Analytics: Métricas indisponíveis (conexão com banco de dados)', err);
+    console.debug('Analytics: Erro ao obter métricas', err);
     return null;
+  }
+};
+
+// Obter dados de retenção para gráfico
+export const getRetentionData = async (videoUrl: string) => {
+  if (!supabaseUrl || !supabaseAnonKey) return [];
+
+  try {
+    const { data, error } = await supabase
+      .from('video_retention_aggregated')
+      .select('second_position, viewer_count')
+      .eq('video_url', videoUrl)
+      .order('second_position', { ascending: true });
+
+    if (error) {
+      console.debug('Analytics: Dados de retenção indisponíveis', error.message);
+      return [];
+    }
+
+    return data || [];
+  } catch (err) {
+    console.debug('Analytics: Erro ao obter retenção', err);
+    return [];
+  }
+};
+
+// Obter análise por dispositivo
+export const getDeviceAnalytics = async (videoUrl: string) => {
+  if (!supabaseUrl || !supabaseAnonKey) return [];
+
+  try {
+    const { data, error } = await supabase
+      .from('device_analytics')
+      .select('*')
+      .eq('video_url', videoUrl);
+
+    if (error) {
+      console.debug('Analytics: Análise de dispositivo indisponível', error.message);
+      return [];
+    }
+
+    return data || [];
+  } catch (err) {
+    console.debug('Analytics: Erro ao obter análise de dispositivo', err);
+    return [];
+  }
+};
+
+// Obter taxa de conversão por segundo
+export const getConversionBySecond = async (videoUrl: string) => {
+  if (!supabaseUrl || !supabaseAnonKey) return [];
+
+  try {
+    const { data, error } = await supabase
+      .from('conversion_by_second')
+      .select('*')
+      .eq('video_url', videoUrl)
+      .order('video_percentage', { ascending: true });
+
+    if (error) {
+      console.debug('Analytics: Conversão por segundo indisponível', error.message);
+      return [];
+    }
+
+    return data || [];
+  } catch (err) {
+    console.debug('Analytics: Erro ao obter conversão por segundo', err);
+    return [];
   }
 };
 
@@ -155,13 +275,13 @@ export const subscribeToVideoEvents = (videoUrl: string, callback: (payload: any
         if (status === 'SUBSCRIBED') {
           console.debug('Analytics: Monitoramento em tempo real ativo');
         } else if (status === 'CHANNEL_ERROR') {
-          console.debug('Analytics: Monitoramento em tempo real indisponível (esperado)');
+          console.debug('Analytics: Monitoramento em tempo real indisponível');
         }
       });
 
     return channel;
   } catch (err) {
-    console.debug('Analytics: Não foi possível ativar monitoramento em tempo real', err);
+    console.debug('Analytics: Erro ao ativar monitoramento em tempo real', err);
     return null;
   }
 };

@@ -1,5 +1,11 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
+import {
+  trackBlurView,
+  trackVideoPlay,
+  trackVideoRetention,
+  trackVideoCompleted,
+} from '../services/videoAnalytics';
 
 interface VideoPlayerProps {
   src: string;
@@ -12,6 +18,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, title = 'Video' }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [isBlurred, setIsBlurred] = useState(true); // Começa desfocado
+  const retentionIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const blurViewTrackedRef = useRef(false);
+
+  // Registrar blur view uma única vez quando o componente monta
+  useEffect(() => {
+    if (!blurViewTrackedRef.current && src) {
+      trackBlurView(src);
+      blurViewTrackedRef.current = true;
+    }
+  }, [src]);
 
   // Quando o usuário clica no botão de play central
   const handlePlayButtonClick = () => {
@@ -26,6 +42,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, title = 'Video' }) => {
       videoRef.current.muted = false;
       setIsMuted(false);
       
+      // Registra o evento de play
+      trackVideoPlay(src);
+      
       // Toca o vídeo
       videoRef.current.play().catch((error) => {
         console.log('Erro ao tocar vídeo:', error);
@@ -33,9 +52,45 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, title = 'Video' }) => {
     }
   };
 
+  // Iniciar rastreamento de retenção quando o vídeo começa a tocar
+  useEffect(() => {
+    if (isPlaying && videoRef.current && !isBlurred) {
+      // Limpar intervalo anterior se existir
+      if (retentionIntervalRef.current) {
+        clearInterval(retentionIntervalRef.current);
+      }
+
+      // Rastrear retenção a cada segundo
+      retentionIntervalRef.current = setInterval(() => {
+        if (videoRef.current) {
+          trackVideoRetention(
+            src,
+            videoRef.current.currentTime,
+            videoRef.current.duration
+          );
+        }
+      }, 1000);
+    } else {
+      // Limpar intervalo quando pausa
+      if (retentionIntervalRef.current) {
+        clearInterval(retentionIntervalRef.current);
+        retentionIntervalRef.current = null;
+      }
+    }
+
+    return () => {
+      if (retentionIntervalRef.current) {
+        clearInterval(retentionIntervalRef.current);
+      }
+    };
+  }, [isPlaying, isBlurred, src]);
+
   // Quando o vídeo chega ao final
   const handleVideoEnded = () => {
     if (videoRef.current) {
+      // Registrar conclusão
+      trackVideoCompleted(src, videoRef.current.currentTime, videoRef.current.duration);
+
       // Volta ao estado inicial
       videoRef.current.currentTime = 0;
       videoRef.current.muted = true;
