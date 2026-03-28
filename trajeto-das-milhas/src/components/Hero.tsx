@@ -2,7 +2,6 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Zap } from 'lucide-react';
 import { useContent } from '../context/ContentContext';
-import VideoPlayer from './VideoPlayer';
 
 const Hero: React.FC = () => {
   const { content } = useContent();
@@ -68,17 +67,7 @@ const Hero: React.FC = () => {
               {content.hero.subtitle}
             </p>
             
-            {/* Video Player */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
-              className="max-w-4xl mx-auto mb-12"
-            >
-              <VideoPlayer src={content.hero.videoUrl} title="Trajeto das Milhas Video" />
-            </motion.div>
-
-            <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-6 mt-12">
               <a 
                 href={content.hero.ctaLink}
                 className="w-full md:w-auto px-6 md:px-10 py-4 bg-[#00D4FF] text-[#050A14] rounded-full font-black text-sm sm:text-base md:text-lg hover:shadow-[0_0_30px_rgba(0,212,255,0.6)] transition-all transform hover:scale-105 text-center flex items-center justify-center gap-2 md:gap-3 whitespace-nowrap"
