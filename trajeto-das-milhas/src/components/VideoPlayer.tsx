@@ -114,7 +114,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, title = 'Video' }) => {
         }`}
         onPlay={handleVideoPlay}
         onPause={handleVideoPause}
-        loop={hasStartedByUser}
         playsInline
         muted={isMuted}
         autoPlay
