@@ -4,7 +4,7 @@ import InputField from './InputField';
 import TextAreaField from './TextAreaField';
 import VideoUpload from './VideoUpload';
 import EditorSection from './EditorSection';
-import { Play, Link, Award, BarChart3, Users, Eye, Clock } from 'lucide-react';
+import { Play, Link, Award, BarChart3, Users, Eye, Clock, Zap } from 'lucide-react';
 
 const HeroEditor: React.FC = () => {
   const { draft, updateDraft } = useDraft();
