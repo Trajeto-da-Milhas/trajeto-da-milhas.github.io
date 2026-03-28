@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
+import { Zap } from 'lucide-react';
 import { useContent } from '../context/ContentContext';
 
 const Hero: React.FC = () => {
@@ -71,7 +72,7 @@ const Hero: React.FC = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3, duration: 0.8 }}
-              className="max-w-4xl mx-auto aspect-video rounded-2xl overflow-hidden border-2 border-[#00D4FF]/20 shadow-[0_0_50px_rgba(0,212,255,0.1)] mb-12"
+              className="max-w-4xl mx-auto aspect-video rounded-2xl overflow-hidden border-2 border-[#00D4FF]/20 shadow-[0_0_50px_rgba(0,212,255,0.15)] mb-12"
             >
               <iframe 
                 width="100%" 
@@ -87,9 +88,13 @@ const Hero: React.FC = () => {
             <div className="flex flex-col md:flex-row items-center justify-center gap-6">
               <a 
                 href={content.hero.ctaLink}
-                className="w-full md:w-auto px-6 md:px-10 py-4 bg-[#00D4FF] text-[#050A14] rounded-full font-black text-sm md:text-lg hover:shadow-[0_0_30px_rgba(0,212,255,0.6)] transition-all transform hover:scale-105 text-center whitespace-nowrap"
+                className="w-full md:w-auto px-8 md:px-10 py-4 bg-[#00D4FF] text-[#050A14] rounded-full font-black text-lg hover:shadow-[0_0_30px_rgba(0,212,255,0.6)] transition-all transform hover:scale-105 text-center flex items-center justify-center gap-3"
               >
-                {content.hero.ctaText}
+                <Zap className="w-6 h-6 flex-shrink-0" />
+                <span className="flex flex-col md:block text-left md:text-center leading-tight md:leading-normal">
+                  <span className="md:hidden">Quero Garantir<br />Minha Vaga</span>
+                  <span className="hidden md:inline">{content.hero.ctaText}</span>
+                </span>
               </a>
             </div>
           </motion.div>
