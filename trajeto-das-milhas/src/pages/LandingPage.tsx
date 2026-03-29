@@ -44,10 +44,17 @@ const LandingPage: React.FC = () => {
     <main className="bg-[#050A14] text-[#E8F4FD] min-h-screen font-sans selection:bg-[#00D4FF] selection:text-[#050A14]">
       <Hero />
       <WhatIs />
-      <Benefits />
-      <MeshGradient />
-      <Testimonials />
-      <Pricing />
+      
+      {/* Secao com Mesh Gradient de fundo */}
+      <div className="relative">
+        <MeshGradient />
+        <div className="relative z-10">
+          <Benefits />
+          <Testimonials />
+          <Pricing />
+        </div>
+      </div>
+      
       <Bonuses />
       <Guarantee />
       <About />
