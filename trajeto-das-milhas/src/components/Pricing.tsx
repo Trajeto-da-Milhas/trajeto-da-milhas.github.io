@@ -7,7 +7,7 @@ const Pricing: React.FC = () => {
   const { content } = useContent();
 
   return (
-    <section id="pricing" className="py-24 relative">
+    <section id="pricing" className="py-24 relative bg-transparent">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-black mb-6">{content.pricing.sectionTitle}</h2>
