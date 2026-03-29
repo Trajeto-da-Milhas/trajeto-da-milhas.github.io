@@ -12,6 +12,13 @@ const VSLStudio: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'player' | 'metrics' | 'upload'>('player');
   const [videoUrl, setVideoUrl] = useState(content.hero.videoUrl);
 
+  // Sincronizar videoUrl quando o conteudo muda
+  useEffect(() => {
+    if (content.hero.videoUrl) {
+      setVideoUrl(content.hero.videoUrl);
+    }
+  }, [content.hero.videoUrl]);
+
   return (
     <div className="min-h-screen bg-[#0A1128] text-white">
       {/* Header */}
