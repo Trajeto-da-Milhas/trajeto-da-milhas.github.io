@@ -8,7 +8,7 @@ const FAQ: React.FC = () => {
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
-    <section className="py-24 bg-[#050A14]">
+    <section className="py-32 bg-[#050A14]">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-black mb-6">Perguntas Frequentes</h2>

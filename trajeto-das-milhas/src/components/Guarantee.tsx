@@ -7,7 +7,7 @@ const Guarantee: React.FC = () => {
   const { content } = useContent();
 
   return (
-    <section className="py-24 relative bg-transparent overflow-hidden">
+    <section className="py-32 relative bg-transparent overflow-hidden">
       <div className="container mx-auto px-6 text-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}

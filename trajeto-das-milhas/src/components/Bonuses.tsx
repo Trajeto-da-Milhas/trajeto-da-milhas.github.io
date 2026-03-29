@@ -7,7 +7,7 @@ const Bonuses: React.FC = () => {
   const { content } = useContent();
 
   return (
-    <section className="py-24 bg-transparent">
+    <section className="py-32 bg-transparent">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <div className="flex items-center justify-center gap-3 mb-4">

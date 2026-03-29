@@ -7,7 +7,7 @@ const Benefits: React.FC = () => {
   const { content } = useContent();
 
   return (
-    <section id="benefits" className="py-24 relative bg-transparent overflow-hidden">
+    <section id="benefits" className="py-32 relative bg-transparent overflow-hidden">
       <div className="container mx-auto px-6 relative z-10">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-black mb-6">Por que fazer parte do grupo?</h2>

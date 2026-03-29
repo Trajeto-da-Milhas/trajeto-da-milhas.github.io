@@ -6,7 +6,7 @@ const WhatIs: React.FC = () => {
   const { content } = useContent();
 
   return (
-    <section id="whatis" className="py-24 bg-[#0A1128] relative overflow-hidden">
+    <section id="whatis" className="py-32 bg-[#0A1128] relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#00D4FF]/5 rounded-full blur-3xl" />

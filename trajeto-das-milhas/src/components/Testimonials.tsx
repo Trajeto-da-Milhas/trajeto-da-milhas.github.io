@@ -18,7 +18,7 @@ const Testimonials: React.FC = () => {
   const prev = () => setCurrentIndex((prev) => (prev - 1 + content.testimonials.length) % content.testimonials.length);
 
   return (
-    <section className="py-24 bg-transparent overflow-hidden">
+    <section className="py-32 bg-transparent overflow-hidden">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-black mb-6">O que nossos membros dizem</h2>
